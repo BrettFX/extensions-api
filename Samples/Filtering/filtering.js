@@ -10,11 +10,19 @@
 
       // Add button handlers for clearing filters.
       $('#clear').click(clearAllFilters);
+
+      // Add button handler for exporting filters.
+      $('#export').click(exportFilters);
     }, function (err) {
       // Something went wrong in initialization.
       console.log('Error while Initializing: ' + err.toString());
     });
   });
+
+  // This function exports all populated filters in a dashboard to a csv file
+  function exportFilters () {
+    alert("Hello World! This is a test...");
+  }
 
   function fetchFilters () {
     // While performing async task, show loading message to user.
