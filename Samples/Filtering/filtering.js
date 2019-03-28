@@ -3,10 +3,11 @@
 // Wrap everything in an anonymous function to avoid polluting the global namespace
 (function () {
   let unregisterHandlerFunctions = [];
+  let dashboardFilters = [];
 
   $(document).ready(function () {
     tableau.extensions.initializeAsync().then(function () {
-      fetchFilters();
+      dashboardFilters = fetchFilters();
 
       // Add button handlers for clearing filters.
       $('#clear').click(clearAllFilters);
@@ -21,7 +22,34 @@
 
   // This function exports all populated filters in a dashboard to a csv file
   function exportFilters () {
-    alert("Hello World! This is a test...");
+    var filter = dashboardFilters[0];
+    
+    const fieldName =  filter.fieldName;
+    const worksheetName = filter.worksheetName;
+    const filterType = filter.filterType;
+    const valueStr = getFilterValues(filter);
+
+    alert(
+      fieldName + "\n" +
+      worksheetName + "\n" +
+      filterType + "\n" +
+      valueStr
+    );
+
+    // dashboardFilters.forEach(function (filter) {
+    //   let newRow = filtersTable.insertRow(filtersTable.rows.length);
+    //   let nameCell = newRow.insertCell(0);
+    //   let worksheetCell = newRow.insertCell(1);
+    //   let typeCell = newRow.insertCell(2);
+    //   let valuesCell = newRow.insertCell(3);
+
+    //   const valueStr = getFilterValues(filter);
+
+    //   nameCell.innerHTML = filter.fieldName;
+    //   worksheetCell.innerHTML = filter.worksheetName;
+    //   typeCell.innerHTML = filter.filterType;
+    //   valuesCell.innerHTML = valueStr;
+    // });
   }
 
   function fetchFilters () {
@@ -67,6 +95,8 @@
 
       buildFiltersTable(dashboardfilters);
     });
+
+    return dashboardfilters;
   }
 
   // This is a handling function that is called anytime a filter is changed in Tableau.
