@@ -4,6 +4,7 @@
 (function () {
   let unregisterHandlerFunctions = [];
   let dashboardFilters = [];
+  const DEBUG_MODE = true;
 
   $(document).ready(function () {
     tableau.extensions.initializeAsync().then(function () {
@@ -22,34 +23,39 @@
 
   // This function exports all populated filters in a dashboard to a csv file
   function exportFilters () {
-    var filter = dashboardFilters[0];
+    // Output directory and file info
+    var outputDir = "http://localhost:8765/filters";
+    var fileName = "filters.csv";
+
+    // Create container in memory for csv representation of filter data
+    var csvContainer = [];
+    csvContainer.push("Filtered Field,Filtered Worksheet,Filter Type,Current Values");    
     
-    const fieldName =  filter.fieldName;
-    const worksheetName = filter.worksheetName;
-    const filterType = filter.filterType;
-    const valueStr = getFilterValues(filter);
+    // Iterate over dashboard filters and create csv container
+    for (var dashFilter of dashboardFilters) {
+      csvContainer.push(dashFilter.fieldName + "," +
+                        dashFilter.worksheetName +  "," +
+                        dashFilter.filterType + "," +
+                        getFilterValues(dashFilter));
+    }
 
-    alert(
-      fieldName + "\n" +
-      worksheetName + "\n" +
-      filterType + "\n" +
-      valueStr
-    );
+    if (DEBUG_MODE) { 
+      console.log("CSV:");
+      console.log(csvContainer); 
+      console.log("JSON:")
+      console.log(dashboardFilters);
+    }
 
-    // dashboardFilters.forEach(function (filter) {
-    //   let newRow = filtersTable.insertRow(filtersTable.rows.length);
-    //   let nameCell = newRow.insertCell(0);
-    //   let worksheetCell = newRow.insertCell(1);
-    //   let typeCell = newRow.insertCell(2);
-    //   let valuesCell = newRow.insertCell(3);
+    // Prompt the user to download the csv
+    var element = document.createElement('a');
+    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(csvContainer));
+    element.setAttribute('download', fileName);
+    element.style.display = 'none';
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
 
-    //   const valueStr = getFilterValues(filter);
-
-    //   nameCell.innerHTML = filter.fieldName;
-    //   worksheetCell.innerHTML = filter.worksheetName;
-    //   typeCell.innerHTML = filter.filterType;
-    //   valuesCell.innerHTML = valueStr;
-    // });
+    if (DEBUG_MODE) { console.log("Export process complete."); }
   }
 
   function fetchFilters () {
